@@ -1,2 +1,8 @@
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.jar filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+javafxWindows_A/javafx-sdk-17.0.18/bin/jfxwebkit.dll filter=lfs diff=lfs merge=lfs -text
+javafxWindows_B/javafx-sdk-17.0.18/bin/jfxwebkit.dll filter=lfs diff=lfs merge=lfs -text
+javafxLinux_B/javafx-sdk-17.0.18/lib/libjfxwebkit.so filter=lfs diff=lfs merge=lfs -text
 /javafxLinux_B/javafx-sdk-17.0.18/lib/libjfxwebkit.so filter=lfs diff=lfs merge=lfs -text
 /javafxWindows_B/javafx-sdk-17.0.18/bin/jfxwebkit.dll filter=lfs diff=lfs merge=lfs -text
