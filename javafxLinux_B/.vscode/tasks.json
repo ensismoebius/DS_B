@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "javac: compile",
+      "type": "shell",
+      "command": "mkdir -p bin && find src -name \"*.java\" | xargs javac --module-path javafx-sdk-17.0.18/lib --add-modules javafx.controls,javafx.fxml -d bin",
+      "group": "build",
+      "problemMatcher": ["$javac"]
+    },
+    {
+      "label": "java: run",
+      "type": "shell",
+      "command": "java --module-path javafx-sdk-17.0.18/lib --add-modules javafx.controls,javafx.fxml -cp bin br.gov.sp.etec.Principal",
+      "problemMatcher": []
+    }
+  ]
+}

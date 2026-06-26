@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Principal (javafxLinux_B)",
+      "request": "launch",
+      "mainClass": "br.gov.sp.etec.Principal",
+      "projectName": "javafxLinux_B",
+      "vmArgs": "--module-path ${workspaceFolder}/javafx-sdk-17.0.18/lib --add-modules javafx.controls,javafx.fxml",
+      "preLaunchTask": "javac: compile"
+    }
+  ]
+}

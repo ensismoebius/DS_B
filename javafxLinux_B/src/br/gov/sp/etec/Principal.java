@@ -1,145 +1,128 @@
 package br.gov.sp.etec;
 
-import javafx.animation.*;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToolBar;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
-/**
- * Exemplo de Animações e Transitions
- * Mostra várias transições do JavaFX e como combiná-las.
- */
 public class Principal extends Application {
+	@Override
+	public void start(Stage palco) throws Exception {
+		VBox layout = new VBox(15);
+		Button somar = new Button("Somar");
+		Button novaJanela = new Button("Nova Janela");
+		
+		Label descricaoNumero01 = new Label("Primeiro número");
+		TextField numero01 = new TextField();
 
-    @Override
-    public void start(Stage stage) {
-        Rectangle rect = new Rectangle(120, 80, Color.CORNFLOWERBLUE);
-        rect.setArcWidth(20);
-        rect.setArcHeight(20);
+		Label descricaoNumero02 = new Label("Segundo número");
+		TextField numero02 = new TextField();
 
-        Circle circle = new Circle(30, Color.SALMON);
+		Label descricaoResultado = new Label("Resultado");
+		TextField resultado = new TextField();
 
-        // Fade transition (retângulo)
-        FadeTransition fade = new FadeTransition(Duration.seconds(1.5), rect);
-        fade.setFromValue(1.0);
-        fade.setToValue(0.2);
-        fade.setAutoReverse(true);
-        fade.setCycleCount(2);
+		layout.getChildren().add(descricaoNumero01);
+		layout.getChildren().add(numero01);
 
-        // Translate transition (círculo)
-        TranslateTransition translate = new TranslateTransition(Duration.seconds(1.2), circle);
-        translate.setByX(180);
-        translate.setAutoReverse(true);
-        translate.setCycleCount(2);
+		layout.getChildren().add(descricaoNumero02);
+		layout.getChildren().add(numero02);
 
-        // Rotate transition (retângulo)
-        RotateTransition rotate = new RotateTransition(Duration.seconds(1.2), rect);
-        rotate.setByAngle(360);
+		layout.getChildren().add(descricaoResultado);
+		layout.getChildren().add(resultado);
 
-        // Scale transition (retângulo)
-        ScaleTransition scale = new ScaleTransition(Duration.seconds(1.0), rect);
-        scale.setToX(1.4);
-        scale.setToY(1.4);
-        scale.setAutoReverse(true);
-        scale.setCycleCount(2);
+		layout.getChildren().add(somar);
 
-        // Path transition (círculo ao longo de um caminho)
-        Path path = new Path();
-        path.getElements().add(new MoveTo(0, 0));
-        path.getElements().add(new LineTo(80, -60));
-        path.getElements().add(new LineTo(180, 0));
-        PathTransition pathTrans = new PathTransition(Duration.seconds(2.0), path, circle);
-        pathTrans.setAutoReverse(true);
-        pathTrans.setCycleCount(2);
+		somar.setOnAction(new EventHandler<ActionEvent>() {
 
-        // Sequential and Parallel transitions
-        SequentialTransition seq = new SequentialTransition(rect, scale, rotate, fade);
-        ParallelTransition par = new ParallelTransition(rect, rotate, scale);
+			@Override
+			public void handle(ActionEvent event) {
 
-        // Timeline example (pulsar opacidade do círculo)
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(circle.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(0.6), new KeyValue(circle.opacityProperty(), 0.3)),
-                new KeyFrame(Duration.seconds(1.2), new KeyValue(circle.opacityProperty(), 1.0)));
-        timeline.setCycleCount(2);
+				float num01 = Float.parseFloat(numero01.getText());
+				float num02 = Float.parseFloat(numero02.getText());
 
-        // Botões para controlar
-        Button btnFade = new Button("Fade");
-        btnFade.setOnAction(e -> fade.playFromStart());
+				float res = num01 + num02;
+				resultado.setText(String.valueOf(res));
+			}
+		});
+		
+		novaJanela.setOnAction(new EventHandler<ActionEvent>() {
 
-        Button btnTranslate = new Button("Translate");
-        btnTranslate.setOnAction(e -> translate.playFromStart());
+			@Override
+			public void handle(ActionEvent event) {
 
-        Button btnRotate = new Button("Rotate");
-        btnRotate.setOnAction(e -> rotate.playFromStart());
+				SelecaoBasica e = new SelecaoBasica();
+				e.batataFrita();
+			}
+		});
 
-        Button btnScale = new Button("Scale");
-        btnScale.setOnAction(e -> scale.playFromStart());
+		HBox caixasDeSelecao = new HBox(12);
 
-        Button btnPath = new Button("Path");
-        btnPath.setOnAction(e -> pathTrans.playFromStart());
+		CheckBox laranja = new CheckBox("Laranja");
+		CheckBox melao = new CheckBox("Melão");
+		CheckBox limao = new CheckBox("Limão");
+		CheckBox manga = new CheckBox("Manga");
+		CheckBox kiwi = new CheckBox("Kiwi");
 
-        Button btnSeq = new Button("Sequential");
-        btnSeq.setOnAction(e -> seq.playFromStart());
+		caixasDeSelecao.getChildren().addAll( //
+				laranja, //
+				melao, //
+				limao, //
+				manga, //
+				kiwi //
+		);
 
-        Button btnPar = new Button("Parallel");
-        btnPar.setOnAction(e -> par.playFromStart());
+		HBox caixasDeEscolha = new HBox(12);
 
-        Button btnTimeline = new Button("Timeline");
-        btnTimeline.setOnAction(e -> timeline.playFromStart());
+		RadioButton ig = new RadioButton("Instagram");
+		RadioButton fb = new RadioButton("Facebook");
+		RadioButton bk = new RadioButton("Blue Sky");
+		RadioButton ok = new RadioButton("Orkut");
+		RadioButton ko = new RadioButton("Koo");
 
-        Button btnReset = new Button("Reset");
-        btnReset.setOnAction(e -> {
-            fade.stop();
-            translate.stop();
-            rotate.stop();
-            scale.stop();
-            pathTrans.stop();
-            seq.stop();
-            par.stop();
-            timeline.stop();
-            rect.setOpacity(1);
-            rect.setRotate(0);
-            rect.setScaleX(1);
-            rect.setScaleY(1);
-            rect.setTranslateX(0);
-            rect.setTranslateY(0);
-            circle.setOpacity(1);
-            circle.setTranslateX(0);
-            circle.setTranslateY(0);
-        });
+		ToggleGroup grupoRedeSocial = new ToggleGroup();
+		ig.setToggleGroup(grupoRedeSocial);
+		fb.setToggleGroup(grupoRedeSocial);
+		bk.setToggleGroup(grupoRedeSocial);
+		ok.setToggleGroup(grupoRedeSocial);
+		ko.setToggleGroup(grupoRedeSocial);
 
-        HBox box = new HBox(10, rect, circle);
-        box.setAlignment(Pos.CENTER);
+		caixasDeEscolha.getChildren().addAll( //
+				ig, //
+				fb, //
+				bk, //
+				ok, //
+				ko //
+		);
 
-        ToolBar toolbar = new ToolBar(btnFade, btnTranslate, btnRotate, btnScale, btnPath, btnSeq, btnPar,
-                btnTimeline, btnReset);
+		layout.getChildren().add(caixasDeSelecao);
+		layout.getChildren().add(caixasDeEscolha);
 
-        BorderPane root = new BorderPane();
-        root.setTop(toolbar);
-        root.setCenter(box);
-        BorderPane.setMargin(box, new Insets(20));
+		Label descricaoComboBox = new Label("Entrega");
+		ComboBox<String> locaisDeEntrega = new ComboBox<>();
+		locaisDeEntrega.getItems().addAll("Vila Constança", "Botafogo", "Perus", "Recando dos Humildes",
+				"Jardim D'Abril", "Vila Mariana");
 
-        Scene scene = new Scene(root, 640, 320);
-        stage.setTitle("Animations & Transitions");
-        stage.setScene(scene);
-        stage.show();
-    }
+		locaisDeEntrega.setPromptText("Selecione um bairro");
+		locaisDeEntrega.setPrefWidth(200);
 
-    public static void main(String[] args) {
-        launch();
-    }
+		layout.getChildren().addAll(descricaoComboBox, locaisDeEntrega, novaJanela);
+
+		Scene cena = new Scene(layout);
+		palco.setScene(cena);
+		palco.show();
+	}
+
+	public static void main(String args[]) {
+		launch(args);
+	}
 }
