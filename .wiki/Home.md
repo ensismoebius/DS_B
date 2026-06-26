@@ -4,6 +4,7 @@ Documentação do projeto **DS_B** (JavaFX 17.0.18).
 
 ## Índice
 
+- **[VS Code (IDE)](VS-Code.md)** — uso do VS Code como IDE nas duas variantes: arquivos `.vscode/`, build, execução e debug.
 - **[Git LFS](Git-LFS.md)** — uso do Git Large File Storage neste repositório: o que é rastreado, motivo, configuração, e fluxo de clone/contribuição.
 
 ## Visão geral
