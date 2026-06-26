@@ -1,106 +1,136 @@
-# Git LFS — DS_B
+# Git LFS
 
-Este repositório usa **Git Large File Storage (LFS)** para versionar os binários do SDK do JavaFX. Esta página documenta tudo que é necessário para clonar, usar e contribuir sem quebrar o histórico.
+Este repositório usa o **[Git Large File Storage (LFS)](https://git-lfs.com/)**
+para armazenar os SDKs JavaFX empacotados e outros binários grandes. Em vez de
+gravar o conteúdo binário no histórico do git, o LFS grava um pequeno
+**arquivo de ponteiro** e envia os bytes reais para o armazenamento LFS no
+remoto (GitHub).
 
-## Por que LFS?
+## Por quê
 
-Os SDKs do JavaFX (`javafx-sdk-17.0.18`) ficam versionados dentro do repositório para garantir builds reprodutíveis. Eles contêm binários grandes:
+O repositório empacota duas distribuições completas do JavaFX SDK 17.0.18
+(Linux + Windows): bibliotecas nativas (`.so`, `.dll`), jars de módulos e
+documentos legais. Manter esses binários no git comum incharia o histórico e
+deixaria cada clone mais lento. O LFS mantém a árvore de trabalho utilizável
+enquanto os bytes pesados ficam fora do histórico.
 
-- `javafxLinux_B/.../lib/libjfxwebkit.so` — **~114 MB**
-- `javafxWindows_B/.../bin/jfxwebkit.dll` — **~90 MB**
+Além do tamanho do histórico, há um limite rígido: o GitHub **rejeita** blobs
+git comuns acima de **100 MB**. Neste repositório, `libjfxwebkit.so` (~114 MB) e
+`jfxwebkit.dll` (~90 MB) ultrapassam esse limite — só entram via LFS.
 
-O GitHub **rejeita** arquivos acima de **100 MB** e **avisa** acima de 50 MB em blobs Git normais. O Git LFS substitui o conteúdo binário por **ponteiros de texto** no histórico e guarda o conteúdo real em um armazenamento separado, contornando esse limite e mantendo o histórico leve.
+No último commit: **145 arquivos** são versionados pelo LFS
+(verifique a contagem atual com `git lfs ls-files | wc -l`).
 
-## O que é rastreado
+## O que é versionado
 
-Regras em [`.gitattributes`](../.gitattributes):
+As regras de versionamento ficam no [`.gitattributes`](../.gitattributes) da
+raiz:
 
 ```gitattributes
-*.dll  filter=lfs diff=lfs merge=lfs -text
-*.jar  filter=lfs diff=lfs merge=lfs -text
-*.so   filter=lfs diff=lfs merge=lfs -text
-javafxWindows_B/javafx-sdk-17.0.18/**  filter=lfs diff=lfs merge=lfs -text
-javafxLinux_B/javafx-sdk-17.0.18/**    filter=lfs diff=lfs merge=lfs -text
+*.jar filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.so  filter=lfs diff=lfs merge=lfs -text
+javafxWindows_B/javafx-sdk-17.0.18/bin/jfxwebkit.dll filter=lfs diff=lfs merge=lfs -text
+javafxLinux_B/javafx-sdk-17.0.18/lib/libjfxwebkit.so filter=lfs diff=lfs merge=lfs -text
+javafxWindows_B/javafx-sdk-17.0.18/** filter=lfs diff=lfs merge=lfs -text
+javafxLinux_B/javafx-sdk-17.0.18/**   filter=lfs diff=lfs merge=lfs -text
 ```
 
-Resumo:
+Resumo das regras:
 
-- **Por extensão**: todos os `*.dll`, `*.so`, `*.jar` do repositório.
-- **Por diretório**: **tudo** dentro das árvores `javafx-sdk-17.0.18/` das duas variantes (glob `/**`), inclusive arquivos pequenos de licença — para manter o SDK inteiro consistente no LFS.
+| Padrão | Efeito |
+|--------|--------|
+| `*.jar`, `*.dll`, `*.so` | Qualquer jar / lib nativa em qualquer lugar → LFS |
+| `javafxLinux_B/javafx-sdk-17.0.18/**`   | Todo arquivo sob o SDK Linux → LFS |
+| `javafxWindows_B/javafx-sdk-17.0.18/**` | Todo arquivo sob o SDK Windows → LFS |
 
-No total, **145 arquivos** estão sob LFS (≈225 MB de objetos).
+As duas linhas de arquivo único (`jfxwebkit.dll`, `libjfxwebkit.so`) são
+redundantes diante dos globs `**`, mantidas por clareza sobre os dois maiores
+binários.
 
-> **Nota sobre `*.jar` e `.gitignore`**: o [`.gitignore`](../.gitignore) ignora `*.jar`. Os `.jar` do SDK estão versionados porque foram adicionados pelo glob de diretório do LFS (que tem precedência ao já estarem rastreados). Não há conflito para os arquivos já commitados.
+## Configuração (clone novo)
 
-> **Notas sobre `.gitattributes`**: existem linhas redundantes/legadas (entradas específicas de arquivo e uma referência antiga a `javafxWindows_A/`, diretório que não existe nesta cópia). São inofensivas — os globs de diretório já cobrem tudo —, mas podem ser limpas em um commit futuro.
-
-## Pré-requisito: instalar o Git LFS
-
-Antes de clonar ou commitar:
-
-```bash
-# Arch Linux
-sudo pacman -S git-lfs
-# Debian/Ubuntu
-sudo apt install git-lfs
-
-git lfs install   # configura os filtros LFS no Git (uma vez por máquina)
-```
-
-## Clonar o repositório
-
-Com o Git LFS instalado, o clone normal já baixa os binários:
+O LFS precisa estar instalado **antes** de clonar, senão os arquivos do SDK
+chegam como ponteiros de texto e a aplicação não inicia.
 
 ```bash
+# uma vez por máquina
+git lfs install
+
 git clone git@github.com:ensismoebius/DS_B.git
 ```
 
-Se clonou **sem** o LFS instalado (os arquivos vêm como ponteiros de texto), baixe o conteúdo real depois:
+Já clonou sem o LFS? Baixe os bytes reais:
 
 ```bash
 git lfs install
 git lfs pull
 ```
 
-Verificar o que está sob LFS:
+## Fluxo de trabalho diário
+
+Com o LFS instalado, ele é transparente — `git add` / `commit` / `push` /
+`pull` cuidam dos ponteiros e dos envios automaticamente.
+
+Adicionar um novo padrão versionado:
 
 ```bash
-git lfs ls-files
-```
-
-## Contribuir / adicionar binários
-
-Os filtros aplicam o LFS automaticamente para arquivos que casam com `.gitattributes`. Fluxo normal:
-
-```bash
-git add <arquivos>
-git commit -m "..."
-git push
-```
-
-Para rastrear um **novo** padrão ou diretório:
-
-```bash
-git lfs track "caminho/para/dir/**"   # atualiza .gitattributes
+git lfs track "*.bin"        # grava a regra no .gitattributes
 git add .gitattributes
 ```
 
-## Histórico: como os SDKs foram migrados para o LFS
-
-Os binários grandes foram, originalmente, commitados como **blobs Git normais** (antes do LFS), o que fazia o `push` ser rejeitado pelo limite de 100 MB do GitHub. A correção reescreveu o histórico convertendo esses blobs em ponteiros LFS:
+Reaplicar os filtros do LFS a arquivos já commitados antes de serem versionados:
 
 ```bash
-git lfs track "javafxWindows_B/javafx-sdk-17.0.18/**"
-git lfs track "javafxLinux_B/javafx-sdk-17.0.18/**"
-git add --renormalize .                    # converte arquivos já rastreados
-git lfs migrate import --everything --above=50MB   # reescreve histórico p/ blobs >50MB
-git push --force origin main               # histórico reescrito
+git add --renormalize .
+git commit -m "Migrate existing files to LFS"
 ```
 
-> **Atenção**: `git lfs migrate import` e `push --force` **reescrevem o histórico**. Em repositório compartilhado, combine com a equipe antes — quem tem clones antigos precisará refazer o clone ou um `git reset --hard origin/main`.
+### Migrar binários grandes já no histórico
+
+Se um binário grande entrou no histórico como blob git comum (antes do LFS), o
+`push` é rejeitado pelo limite do GitHub. Reescreva o histórico convertendo os
+blobs em ponteiros LFS:
+
+```bash
+git lfs migrate import --everything --above=50MB   # reescreve blobs > 50 MB
+git push --force origin main
+```
+
+> **Atenção**: `migrate import` e `push --force` **reescrevem o histórico**. Em
+> repositório compartilhado, combine com a equipe antes — clones antigos
+> precisarão refazer o clone ou um `git reset --hard origin/main`.
+
+## Inspecionar o estado do LFS
+
+```bash
+git lfs ls-files          # lista arquivos versionados (oid + caminho)
+git lfs ls-files | wc -l  # conta os arquivos
+git lfs status            # arquivos LFS em stage/modificados
+git lfs env               # endpoint + config do cache local de objetos
+```
+
+Endpoint atual: `https://github.com/ensismoebius/DS_B.git/info/lfs`
+Cache local de objetos: `.git/lfs/objects`
+
+Um arquivo de ponteiro (o que de fato fica no git) tem esta cara:
+
+```
+version https://git-lfs.github.com/spec/v1
+oid sha256:<hash>
+size <bytes>
+```
 
 ## Solução de problemas
 
-- **Arquivos aparecem como ponteiro de texto** (poucas linhas com `version https://git-lfs...`): rode `git lfs install && git lfs pull`.
-- **`push` rejeitado por tamanho**: confirme que o arquivo casa com algum padrão do `.gitattributes` (`git check-attr filter <arquivo>` deve mostrar `filter: lfs`). Se entrou no histórico como blob normal, use `git lfs migrate import`.
-- **Conferir um arquivo**: `git check-attr filter diff merge -- <arquivo>`.
+| Sintoma | Causa | Correção |
+|---------|-------|----------|
+| Aplicação não inicia; jars são arquivos de texto minúsculos | Clonado sem LFS | `git lfs install && git lfs pull` |
+| `smudge filter lfs failed` | LFS não instalado | `git lfs install`, depois refaça o checkout |
+| Novo binário commitado como blob bruto | Padrão ausente no `.gitattributes` | `git lfs track "<padrão>"`, depois `git add --renormalize .` |
+| `push` rejeitado por arquivo > 100 MB | Blob grande já no histórico | `git lfs migrate import --above=50MB`, depois `git push --force` |
+| Texto do ponteiro exibido no lugar do binário | Arquivo obtido antes do pull do LFS | `git lfs checkout` ou `git lfs pull` |
+
+---
+
+Voltar para o [Início](Home.md) · [README](../README.md).

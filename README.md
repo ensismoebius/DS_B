@@ -1,53 +1,48 @@
 # DS_B — Projeto JavaFX
 
-Projeto de estudo em **JavaFX 17.0.18**, com dois ambientes prontos: `javafxWindows_B` (Windows) e `javafxLinux_B` (Linux). Pacote `br.gov.sp.etec`, classe principal `Principal`.
+Aplicação JavaFX empacotada com um SDK JavaFX autocontido para Linux e Windows.
+Compilada com **Java 21**, runtime **JavaFX SDK 17.0.18**.
 
 ## Estrutura
 
-```
-DS_B/
-├── javafxWindows_B/          # Variante Windows
-│   ├── src/br/gov/sp/etec/   # Código-fonte Java
-│   ├── javafx-sdk-17.0.18/   # SDK JavaFX (Windows) — rastreado via Git LFS
-│   └── .vscode/              # Configuração do VSCode como IDE
-├── javafxLinux_B/            # Variante Linux
-│   ├── src/br/gov/sp/etec/   # Código-fonte Java
-│   ├── javafx-sdk-17.0.18/   # SDK JavaFX (Linux) — rastreado via Git LFS
-│   └── .vscode/              # Configuração do VSCode como IDE
-├── .gitattributes           # Regras do Git LFS
-└── README.md
-```
+| Caminho | Descrição |
+|---------|-----------|
+| `javafxLinux_B/`   | Projeto Eclipse/VS Code + SDK JavaFX para Linux empacotado |
+| `javafxWindows_B/` | Projeto Eclipse/VS Code + SDK JavaFX para Windows empacotado |
+| `*/src/`           | Código-fonte Java (`br.gov.sp.etec`) |
+| `*/javafx-sdk-17.0.18/` | SDK JavaFX empacotado (versionado via **Git LFS**) |
 
 ## Pré-requisitos
 
-- **JDK 17+**
-- **Git LFS** instalado e inicializado (`git lfs install`) — obrigatório para baixar os SDKs do JavaFX. Veja a [documentação detalhada do LFS](.wiki/Git-LFS.md).
-- **VSCode** com a extensão *Extension Pack for Java*.
-
-## Como abrir no VSCode (IDE)
-
-Os dois ambientes já vêm configurados como projeto VSCode. Abra a pasta da variante desejada (`javafxWindows_B` ou `javafxLinux_B`) diretamente no VSCode. A pasta `.vscode/` de cada uma fornece:
-
-- **`settings.json`** — define `src` como fonte, `bin` como saída e as libs do JavaFX (`javafx-sdk-17.0.18/lib/**/*.jar`).
-- **`tasks.json`** — tarefas `javac: compile` (compila) e `java: run` (executa).
-- **`launch.json`** — configuração de depuração *Debug Principal* com os `vmArgs` do módulo JavaFX.
-
-Execute via **Run and Debug** (`F5`) ou pela paleta de tarefas (`Ctrl+Shift+B`).
-
-## Execução manual (linha de comando)
+- JDK 21
+- [Git LFS](https://git-lfs.com/) — **obrigatório** para clonar os binários do
+  SDK. Sem ele, os arquivos `.jar`/`.so`/`.dll` chegam como ponteiros de texto
+  e a aplicação não executa.
 
 ```bash
-# A partir de javafxLinux_B ou javafxWindows_B
-mkdir -p bin
-find src -name "*.java" | xargs javac --module-path javafx-sdk-17.0.18/lib \
-  --add-modules javafx.controls,javafx.fxml -d bin
-java --module-path javafx-sdk-17.0.18/lib \
-  --add-modules javafx.controls,javafx.fxml -cp bin br.gov.sp.etec.Principal
+git lfs install
+git clone git@github.com:ensismoebius/DS_B.git
 ```
 
-## Documentação (Wiki)
+Caso já tenha clonado sem o LFS:
 
-Detalhes completos do projeto ficam no diretório [`.wiki/`](.wiki/):
+```bash
+git lfs install
+git lfs pull
+```
 
-- **[Início](.wiki/Home.md)** — visão geral e índice.
-- **[Git LFS](.wiki/Git-LFS.md)** — tudo sobre o uso do Git LFS neste repositório (o que é rastreado, por quê, e como clonar/contribuir).
+## Executar
+
+Abra `javafxLinux_B` (ou `javafxWindows_B`) no Eclipse ou no VS Code e execute
+`br.gov.sp.etec.Principal`. O classpath já referencia os jars do SDK empacotado
+em `javafx-sdk-17.0.18/lib/`.
+
+## Documentação
+
+A documentação completa do projeto fica na **[wiki](.wiki/)**:
+
+- **[Início](.wiki/Home.md)** — índice da wiki
+- **[Git LFS](.wiki/Git-LFS.md)** — como os arquivos grandes são armazenados,
+  padrões versionados, configuração e solução de problemas
+- **[VS Code (IDE)](.wiki/VS-Code.md)** — uso dos projetos no VS Code: build,
+  execução e debug

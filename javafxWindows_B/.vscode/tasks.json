@@ -5,6 +5,9 @@
       "label": "javac: compile",
       "type": "shell",
       "command": "mkdir -p bin && find src -name \"*.java\" | xargs javac --module-path javafx-sdk-17.0.18/lib --add-modules javafx.controls,javafx.fxml -d bin",
+      "windows": {
+        "command": "if (!(Test-Path bin)) { New-Item -ItemType Directory bin | Out-Null }; javac --module-path javafx-sdk-17.0.18/lib --add-modules javafx.controls,javafx.fxml -d bin (Get-ChildItem -Recurse -Filter *.java src).FullName"
+      },
       "group": "build",
       "problemMatcher": ["$javac"]
     },
